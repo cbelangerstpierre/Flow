@@ -15,7 +15,41 @@ window.addEventListener("load", () => {
     resetGrid(mapSize)
     createMap()
     printGrid()
+    // We can add "mousedown" or "mousemove"
+    document.addEventListener("click", mousePos)
 })
+
+
+/**
+ * Return the Board position of the mouse
+ */
+function mousePos(event)
+{
+    for (let i = 0; i < board.length; i += 1)
+    {
+        for (let j = 0; j < board.length; j += 1)
+        {
+            let coordinates = root.children[i].children[j].getBoundingClientRect()
+            if (isBetween(event.clientY, coordinates.top, coordinates.bottom)
+            && isBetween(event.clientX, coordinates.left, coordinates.right))
+            {
+                return [i, j]
+            }
+        }
+    }
+}
+
+/**
+ * Return True if the value a is between b and c
+ */
+function isBetween(a, b, c)
+{
+    if ((b < a && a < c) || (c < a && a < b))
+    {
+        return true
+    }
+    return
+}
 
 
 function resetGrid(mapSize)
@@ -33,7 +67,9 @@ function resetGrid(mapSize)
     }
 }
 
-
+/**
+ * Add a random pair of points for each color
+ */
 function createMap()
 {
     for (let i = 0; i < colors.length; i++)
