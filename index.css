@@ -1,0 +1,42 @@
+#root {
+    display: flex;
+    flex-direction: column;
+    
+    margin: auto;
+
+    height: 600px;
+    width: 600px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+
+    flex-grow: 1;
+}
+
+.case {
+    position: relative;
+    flex-grow: 1;
+
+    background-color: gray;
+    border: 1px solid black;
+}
+
+.dot {
+    position: absolute;
+
+    width: 70%;
+    height: 70%;
+    margin: 0;
+    top: 50%;
+    left: 50%;
+
+    border-radius: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+.red {
+    background-color: red;
+}
