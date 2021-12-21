@@ -1,62 +1,106 @@
-const empty = 1
-const dot = 2
-const line = 3
+const colors = ["red", "orange", "yellow", "green", "blue"]
+const types = { dot: "dot", line: "line", empty: "empty" }
+// pas utiliser board, noter emplacement des points et où la ligne tourne
+const points = [{ color: "red", start: "0;2", end: "3;4", corners: ["4;4", "4;5"] }]
 
 var root
-var grid = []
+var board = []
 
 
 window.addEventListener("load", () => {
     root = document.getElementById("root")
 
-    createGrid(8)
-    createPoint(8)
-    printGrid()
+    let mapSize = 8
 
+    resetGrid(mapSize)
+    createMap()
+    printGrid()
 })
 
-function createGrid(size)
-{
-    grid = []
 
-    for (let i = 0; i < size; i += 1)
+function resetGrid(mapSize)
+{
+    board = []
+
+    for (let i = 0; i < mapSize; i += 1)
     {
-        grid[i] = []
+        board[i] = []
         
-        for (let j = 0; j < size; j += 1)
+        for (let j = 0; j < mapSize; j += 1)
         {
-            grid[i][j] = { type: empty }
+            board[i][j] = { type: types.empty }
         }
     }
 }
 
-function createPoint(size)
+
+function createMap()
 {
-    let pos = Math.floor(Math.random() * size * size)
-    let column = pos % size
-    let row = (pos - column) / size
-    grid[row][column] = { type: dot, color: "red" }
+    for (let i = 0; i < colors.length; i++)
+    {
+        createPoint(colors[i])
+        createPoint(colors[i])
+    }
+}
+
+/**
+ * Adds a point in a random spot
+ * @param color the color of the point
+ */
+function createPoint(color)
+{
+    let column
+    let row
+
+    do
+    {
+        column = Math.floor(Math.random() * board.length)
+        row = Math.floor(Math.random() * board.length)
+    } while (board[row][column].type !== types.empty)
+
+    board[row][column] = { type: types.dot, color: color }
+    console.log(`New point at (${column};${row})`)
+}
+
+/**
+ * Create a line between two points
+ */
+function createLine(row, column, color, lastCasePos)
+{
+    grid[row][column] = { type: types.line, color: color }
+    console.log(`New line at (${column};${row})`)
 }
 
 
+/**
+ * Create divs into the #root
+*/
 function printGrid()
 {
-    for (let row in grid)
+    // Remove all existing children
+    while (root.firstChild)
+        root.removeChild(root.lastChild)
+
+    for (let row in board)
     {
+        // Create row
         let rowDiv = document.createElement("div")
         rowDiv.className = "row"
         root.appendChild(rowDiv)
 
-        for (let c in grid[row])
+        for (let c in board[row])
         {
+            // Create case
             let caseDiv = document.createElement("div")
             caseDiv.className = "case"
             rowDiv.appendChild(caseDiv)
 
-            if (grid[row][c].type === dot)
+            // Add a dot inside the case if there is one
+            if (board[row][c].type === types.dot)
             {
                 let dot = document.createElement("div")
-                dot.className = "dot " + grid[row][c].color
+                dot.className = "dot"
+                dot.style.backgroundColor = board[row][c].color
                 caseDiv.appendChild(dot)
             }
         }
