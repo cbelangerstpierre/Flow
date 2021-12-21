@@ -22,17 +22,19 @@ window.addEventListener("load", () => {
 
 /**
  * Return the Board position of the mouse
+ * @param {Array} event
+ * @returns {Array}
  */
 function mousePos(event)
 {
-    for (let i = 0; i < board.length; i += 1)
+    for (let i = 0; i < board.length; i ++)
     {
-        for (let j = 0; j < board.length; j += 1)
+        for (let j = 0; j < board.length; j ++)
         {
             let coordinates = root.children[i].children[j].getBoundingClientRect()
-            if (isBetween(event.clientY, coordinates.top, coordinates.bottom)
-            && isBetween(event.clientX, coordinates.left, coordinates.right))
-            {
+            if (isBetween(event.clientY, coordinates.top, coordinates.bottom) && 
+                isBetween(event.clientX, coordinates.left, coordinates.right)
+            ) {
                 return [i, j]
             }
         }
@@ -41,14 +43,14 @@ function mousePos(event)
 
 /**
  * Return True if the value a is between b and c
+ * @param {number} a
+ * @param {number} b
+ * @param {number} c
+ * @returns {boolean}
  */
 function isBetween(a, b, c)
 {
-    if ((b < a && a < c) || (c < a && a < b))
-    {
-        return true
-    }
-    return
+    return (b < a && a < c) || (c < a && a < b)
 }
 
 
@@ -56,11 +58,11 @@ function resetGrid(mapSize)
 {
     board = []
 
-    for (let i = 0; i < mapSize; i += 1)
+    for (let i = 0; i < mapSize; i ++)
     {
         board[i] = []
         
-        for (let j = 0; j < mapSize; j += 1)
+        for (let j = 0; j < mapSize; j ++)
         {
             board[i][j] = { type: types.empty }
         }
@@ -72,16 +74,15 @@ function resetGrid(mapSize)
  */
 function createMap()
 {
-    for (let i = 0; i < colors.length; i++)
-    {
-        createPoint(colors[i])
-        createPoint(colors[i])
-    }
+    colors.forEach(color => {
+        createPoint(color);
+        createPoint(color)
+    });
 }
 
 /**
  * Adds a point in a random spot
- * @param color the color of the point
+ * @param {string} color the color of the point
  */
 function createPoint(color)
 {
@@ -117,36 +118,26 @@ function printGrid()
     while (root.firstChild)
         root.removeChild(root.lastChild)
 
-    for (let row in board)
-    {
+    board.forEach(row => {
         // Create row
         let rowDiv = document.createElement("div")
         rowDiv.className = "row"
         root.appendChild(rowDiv)
 
-        for (let c in board[row])
-        {
+        row.forEach(c => {
             // Create case
             let caseDiv = document.createElement("div")
             caseDiv.className = "case"
             rowDiv.appendChild(caseDiv)
 
-            // Add a dot inside the case if there is one
-            if (board[row][c].type === types.dot)
+            // Add a dot/line inside the case if there is one
+            if (c.type !== types.empty)
             {
-                let dot = document.createElement("div")
-                dot.className = "dot"
-                dot.style.backgroundColor = board[row][c].color
-                caseDiv.appendChild(dot)
-            } 
-            
-            else if (board[row][c].type === types.line)
-            {
-                let line = document.createElement("div")
-                line.className = "line"
-                line.style.backgroundColor = board[row][c].color
-                caseDiv.appendChild(line)
+                let type = document.createElement("div")
+                type.className = c.type
+                type.style.backgroundColor = c.color
+                caseDiv.appendChild(type)
             }
-        }
-    }
+        });
+    });
 }
