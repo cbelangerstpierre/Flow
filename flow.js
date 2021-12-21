@@ -102,6 +102,14 @@ function printGrid()
                 dot.className = "dot"
                 dot.style.backgroundColor = board[row][c].color
                 caseDiv.appendChild(dot)
+            } 
+            
+            else if (board[row][c].type === types.line)
+            {
+                let line = document.createElement("div")
+                line.className = "line"
+                line.style.backgroundColor = board[row][c].color
+                caseDiv.appendChild(line)
             }
         }
     }
