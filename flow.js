@@ -12,11 +12,22 @@ window.addEventListener("load", () => {
 
     let mapSize = 8
 
-    resetGrid(mapSize)
-    createMap()
+    createMap(mapSize)
     printGrid()
     // We can add "mousedown" or "mousemove"
-    document.addEventListener("click", mousePos)
+    // $("#root").mousedown(function () {
+    //     $("#root").mousemove(function () {
+    //         console.log("OK moved")
+    //     })
+    // }).mouseup(function () {
+    //     $("#root").unbind('mousemove');
+    // }).mouseout(function () {
+    //     $("#root").unbind('mousemove');
+    // });
+    document.addEventListener("click", function(){
+        createLine(event, color="red")
+        printGrid()
+    })
 })
 
 
@@ -27,18 +38,35 @@ window.addEventListener("load", () => {
  */
 function mousePos(event)
 {
-    for (let i = 0; i < board.length; i ++)
+    if (isInsideRoot(event.clientX, event.clientY))
     {
-        for (let j = 0; j < board.length; j ++)
+        for (let i = 0; i < board.length; i ++)
         {
-            let coordinates = root.children[i].children[j].getBoundingClientRect()
-            if (isBetween(event.clientY, coordinates.top, coordinates.bottom) && 
-                isBetween(event.clientX, coordinates.left, coordinates.right)
-            ) {
-                return [i, j]
+            for (let j = 0; j < board.length; j ++)
+            {
+                let coordinates = root.children[i].children[j].getBoundingClientRect()
+                if (isBetween(event.clientY, coordinates.top, coordinates.bottom) && 
+                    isBetween(event.clientX, coordinates.left, coordinates.right)
+                ) {
+                    return [i, j]
+                }
             }
         }
     }
+}
+
+/**
+ * Return True if the x and y is inside the root.
+ * @param {number} x 
+ * @param {number} y 
+ * @returns {boolean}
+ */
+
+function isInsideRoot(x, y)
+{
+    root_coords = root.getBoundingClientRect()
+    return isBetween(x, root_coords.left, root_coords.right) &&
+        isBetween(y, root_coords.bottom, root_coords.top)
 }
 
 /**
@@ -50,11 +78,17 @@ function mousePos(event)
  */
 function isBetween(a, b, c)
 {
-    return (b < a && a < c) || (c < a && a < b)
+    return (b <= a && a <= c) || (c <= a && a <= b)
+}
+
+function createMap(mapSize)
+{
+    resetBoard(mapSize)
+    createPoints()
 }
 
 
-function resetGrid(mapSize)
+function resetBoard(mapSize)
 {
     board = []
 
@@ -72,7 +106,7 @@ function resetGrid(mapSize)
 /**
  * Add a random pair of points for each color
  */
-function createMap()
+function createPoints()
 {
     colors.forEach(color => {
         createPoint(color);
@@ -101,11 +135,24 @@ function createPoint(color)
 
 /**
  * Create a line between two points
+ * @param {Array} event
+ * @param {string} color 
+ * @param {*} lastCasePos 
  */
-function createLine(row, column, color, lastCasePos)
+function createLine(event, color, lastCasePos)
 {
-    grid[row][column] = { type: types.line, color: color }
-    console.log(`New line at (${column};${row})`)
+    let pos = mousePos(event)
+    if (pos)
+    {
+        let row = pos[0]
+        let column = pos[1]
+        if (board[row][column].type === types.empty)
+        {
+            console.log(color)
+            board[row][column] = { type: types.dot, color: color }
+            console.log(`New line at (${column};${row})`)
+        }
+    }
 }
 
 
