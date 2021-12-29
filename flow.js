@@ -1,190 +1,346 @@
-const colors = ["red", "orange", "yellow", "green", "blue"]
-const types = { dot: "dot", line: "line", empty: "empty" }
-// pas utiliser board, noter emplacement des points et où la ligne tourne
-const points = [{ color: "red", start: "0;2", end: "3;4", corners: ["4;4", "4;5"] }]
+const colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"]
 
-var root
-var board = []
+let board
+let flows = []
+let boardSize = 8
+let currentFlow
 
 
 window.addEventListener("load", () => {
-    root = document.getElementById("root")
+    board = document.getElementById("board")
 
-    let mapSize = 8
+    createGame()
+    showPoints()
 
-    createMap(mapSize)
-    printGrid()
     // We can add "mousedown" or "mousemove"
-    // $("#root").mousedown(function () {
-    //     $("#root").mousemove(function () {
-    //         console.log("OK moved")
-    //     })
-    // }).mouseup(function () {
-    //     $("#root").unbind('mousemove');
-    // }).mouseout(function () {
-    //     $("#root").unbind('mousemove');
-    // });
-    document.addEventListener("click", function(){
-        createLine(event, color="red")
-        printGrid()
+    board.addEventListener("mousedown", (event) => {
+        let pos = getCaseClicked(event.clientX, event.clientY)
+
+        if (pos)
+        {
+            flows.forEach((flow) => {
+                if (pointsAreEqual(flow.first, pos) || pointsAreEqual(flow.second, pos))
+                {
+                    flow.lines = [ pos ]
+                    flow.corners = [ pos ]
+                    flow.lineCompleted = false
+                    currentFlow = flow
+                }
+            })
+        }
     })
+
+    const mouseOut = () => {
+        if (currentFlow)
+        {
+            currentFlow.lines = []
+            currentFlow.corners = []
+            currentFlow = undefined
+            drawLines()
+        }
+    }
+
+    board.addEventListener("mouseup", mouseOut)
+    board.addEventListener("mouseleave", mouseOut)
+
+    board.addEventListener("mousemove", handleMouseMove)
 })
 
 
 /**
- * Return the Board position of the mouse
- * @param {Array} event
- * @returns {Array}
+ * Create a new level
  */
-function mousePos(event)
+function createGame()
 {
-    if (isInsideRoot(event.clientX, event.clientY))
-    {
-        for (let i = 0; i < board.length; i ++)
-        {
-            for (let j = 0; j < board.length; j ++)
-            {
-                let coordinates = root.children[i].children[j].getBoundingClientRect()
-                if (isBetween(event.clientY, coordinates.top, coordinates.bottom) && 
-                    isBetween(event.clientX, coordinates.left, coordinates.right)
-                ) {
-                    return [i, j]
-                }
-            }
-        }
-    }
-}
-
-/**
- * Return True if the x and y is inside the root.
- * @param {number} x 
- * @param {number} y 
- * @returns {boolean}
- */
-
-function isInsideRoot(x, y)
-{
-    root_coords = root.getBoundingClientRect()
-    return isBetween(x, root_coords.left, root_coords.right) &&
-        isBetween(y, root_coords.bottom, root_coords.top)
-}
-
-/**
- * Return True if the value a is between b and c
- * @param {number} a
- * @param {number} b
- * @param {number} c
- * @returns {boolean}
- */
-function isBetween(a, b, c)
-{
-    return (b <= a && a <= c) || (c <= a && a <= b)
-}
-
-function createMap(mapSize)
-{
-    resetBoard(mapSize)
+    drawBoard()
     createPoints()
+
+    // let simFlows = []
+
+    // colors.forEach((color, i) => {
+    //     simFlows.push({
+    //         color: color,
+    //         first: { row: 0, column: i },
+    //         second: { row: boardSize - 1, column: i },
+    //         corners: [],
+    //         lineCompleted: false
+    //     })
+    // })
 }
 
 
-function resetBoard(mapSize)
+/**
+ * Create a new board
+ */
+function drawBoard()
 {
-    board = []
+    // Remove all existing children
+    while (board.firstChild)
+        board.removeChild(board.lastChild)
 
-    for (let i = 0; i < mapSize; i ++)
+    for (let i = 0; i < boardSize; i++)
     {
-        board[i] = []
-        
-        for (let j = 0; j < mapSize; j ++)
+        // Create row
+        let rowDiv = document.createElement("div")
+        rowDiv.className = "row"
+        board.appendChild(rowDiv)
+
+        for (let j = 0; j < boardSize; j++)
         {
-            board[i][j] = { type: types.empty }
+            // Create case
+            let caseDiv = document.createElement("div")
+            caseDiv.className = "case"
+            rowDiv.appendChild(caseDiv)
         }
     }
 }
+
 
 /**
  * Add a random pair of points for each color
  */
 function createPoints()
 {
-    colors.forEach(color => {
-        createPoint(color);
-        createPoint(color)
+    colors.forEach((color) => {
+        flows.push({
+            color: color,
+            first: randomPoint(),
+            second: randomPoint(),
+            corners: [],
+            lines: [],
+            lineCompleted: false
+        })
     });
 }
 
+
 /**
- * Adds a point in a random spot
- * @param {string} color the color of the point
+ * Generates a random point
  */
-function createPoint(color)
+function randomPoint()
 {
-    let column
-    let row
+    let point = { row: Math.floor(Math.random() * boardSize), column: Math.floor(Math.random() * boardSize) }
 
-    do
-    {
-        column = Math.floor(Math.random() * board.length)
-        row = Math.floor(Math.random() * board.length)
-    } while (board[row][column].type !== types.empty)
+    flows.forEach((flow) => {
+        if (pointsAreEqual(flow.first, point) || pointsAreEqual(flow.second, point))
+            return randomPoint()
+    })
 
-    board[row][column] = { type: types.dot, color: color }
-    console.log(`New point at (${column};${row})`)
+    console.log(`New point at (${point.row};${point.column})`)
+    return point
+}
+
+
+/**
+ * Compare the position of two points
+ * @param {object} first A point
+ * @param {object} second A point
+ * @returns {boolean} If the two points are at the same position
+ */
+function pointsAreEqual(first, second)
+{
+    return first.row == second.row && first.column == second.column
+}
+
+
+/**
+ * Return the position of the case that the mouse is in
+ * @param {number} x The X position of the mouse
+ * @param {number} y The Y position of the mouse
+ * @returns {object} An object containing the position of the case
+ */
+function getCaseClicked(x, y)
+{
+    for (let row = 0; row < boardSize; row++)
+        for (let column = 0; column < boardSize; column++)
+        {
+            let rect = board.children[row].children[column].getBoundingClientRect()
+            // If the (x,y) is inside the current case
+            if (rect.top <= y && y <= rect.bottom && rect.left <= x && x <= rect.right)
+                return { row: row, column: column }
+        }
+
+    console.warn("Can't find where the mouse clicked.")
 }
 
 /**
- * Create a line between two points
- * @param {Array} event
- * @param {string} color 
- * @param {*} lastCasePos 
+ * Handles the mouse movements
  */
-function createLine(event, color, lastCasePos)
+function handleMouseMove(event)
 {
-    let pos = mousePos(event)
-    if (pos)
+    if (!currentFlow)
+        return
+
+    let pos = getCaseClicked(event.clientX, event.clientY)
+    if (!pos)
+        return
+        
+    // Do nothing if didn't move
+    if (pointsAreEqual(currentFlow.lines.at(-1), pos))
+        return
+        
+    // Add the corner if it is one
+    if (currentFlow.corners.at(-1).row != pos.row && currentFlow.corners.at(-1).column != pos.column)
     {
-        let row = pos[0]
-        let column = pos[1]
-        if (board[row][column].type === types.empty)
+        console.log(currentFlow.lines.at(-1), "is a corner")
+        currentFlow.corners.push(currentFlow.lines.at(-1))
+    }
+
+    // Finish flow if we touch other point
+    if ((pointsAreEqual(currentFlow.second, pos) && pointsAreEqual(currentFlow.first, currentFlow.corners.at(0))) // We are at second point and started at first point
+        || (pointsAreEqual(currentFlow.first, pos) && pointsAreEqual(currentFlow.second, currentFlow.corners.at(0))) // We are at first point and started at second point
+    )
+    {
+        currentFlow.corners.push(pos)
+        currentFlow.lines.push(pos)
+        currentFlow.lineCompleted = true
+        currentFlow = undefined
+        console.log("Line completed !!")
+        drawLines()
+        return
+    }
+
+    // Wrap if we touch our own line, we start over from that line
+    if (!currentFlow.lines.every((c) => {
+            if (pointsAreEqual(c, pos))
+            {
+                while (!pointsAreEqual(currentFlow.lines.at(-1), c))
+                {
+                    let removedPoint = currentFlow.lines.pop()
+
+                    // Remove the corner if we removed the point
+                    currentFlow.corners.forEach((corner) => {
+                        if (pointsAreEqual(corner, removedPoint))
+                            currentFlow.corners.splice(currentFlow.corners.indexOf(corner), 1)
+                    })
+                }
+
+                return false
+            }
+            
+            return true
+        })
+    )
+    {
+        console.log("Line wrap")
+        drawLines()
+        return
+    }
+
+    // Stop if we touch another color's point
+    if (!flows.filter((flow) => flow != currentFlow).every((flow) => {
+            return !(pointsAreEqual(flow.first, pos) || pointsAreEqual(flow.second, pos))
+        })
+    )
+    {
+        console.log("Touched another color point")
+        currentFlow.lines = []
+        currentFlow.corners = []
+        currentFlow = undefined
+        drawLines()
+        return
+    }
+
+    // Stop if we touch another color's line
+    if (!flows.filter((flow) => flow != currentFlow).every((flow) => {
+            return flow.lines.every((c) => {
+                if (pointsAreEqual(c, pos))
+                {
+                    currentFlow.lines = []
+                    currentFlow.corners = []
+                    return false
+                }
+
+                return true
+            })
+        })
+    )
+    {
+        console.log("Touched another color line")
+        currentFlow.lines = []
+        currentFlow.corners = []
+        currentFlow = undefined
+        drawLines()
+        return
+    }
+
+    // Add the current pos to lines
+    currentFlow.lines.push(pos)
+    drawLines()
+}
+
+
+/**
+ * Create points into the HTML
+ */
+function showPoints()
+{
+    let showPoint = (pos, color) => {
+        let point = document.createElement("div")
+        point.className = "dot"
+        point.style.backgroundColor = color
+        board.children[pos.row].children[pos.column].appendChild(point)
+    }
+    
+    flows.forEach((flow) => {
+        showPoint(flow.first, flow.color)
+        showPoint(flow.second, flow.color)
+    })
+}
+
+
+/**
+ * Create lines into the HTML
+ */
+function drawLines()
+{
+    const caseSize = parseInt(getComputedStyle(board).width.slice(0, -2)) / boardSize
+
+    let children = [ ...board.children ]
+    // Remove all existing children
+    for (let child of children)
+    {
+        if (child.className == "line")
+            board.removeChild(child)
+    }
+
+    const drawLine = (first, second, color) => {
+        let line = document.createElement("div")
+        line.className = "line"
+        line.style.backgroundColor = color
+        board.appendChild(line)
+        let lineThickness = parseInt(getComputedStyle(line).width.slice(0, -2))
+
+        if (first.row == second.row)
         {
-            console.log(color)
-            board[row][column] = { type: types.dot, color: color }
-            console.log(`New line at (${column};${row})`)
+            line.style.width = `${caseSize * Math.abs(first.column - second.column) + lineThickness}px`
+            line.style.top = `${caseSize * (first.row + 0.5) - lineThickness / 2}px`
+            
+            if (first.column < second.column)
+                line.style.left = `${caseSize * (first.column + 0.5) - lineThickness / 2}px`
+            
+            else
+                line.style.left = `${caseSize * (second.column + 0.5) - lineThickness / 2}px`
+        }
+
+        else if (first.column == second.column)
+        {
+            line.style.height = `${caseSize * Math.abs(first.row - second.row) + lineThickness}px`
+            line.style.left = `${caseSize * (first.column + 0.5) - lineThickness / 2}px`
+            
+            if (first.row < second.row)
+                line.style.top = `${caseSize * (first.row + 0.5) - lineThickness / 2}px`
+
+            else
+                line.style.top = `${caseSize * (second.row + 0.5) - lineThickness / 2}px`
         }
     }
-}
 
+    flows.forEach((flow) => {
+        for (let i = 0; i < flow.corners.length - 1; i++)
+            drawLine(flow.corners[i], flow.corners[i + 1], flow.color)
 
-/**
- * Create divs into the #root
-*/
-function printGrid()
-{
-    // Remove all existing children
-    while (root.firstChild)
-        root.removeChild(root.lastChild)
-
-    board.forEach(row => {
-        // Create row
-        let rowDiv = document.createElement("div")
-        rowDiv.className = "row"
-        root.appendChild(rowDiv)
-
-        row.forEach(c => {
-            // Create case
-            let caseDiv = document.createElement("div")
-            caseDiv.className = "case"
-            rowDiv.appendChild(caseDiv)
-
-            // Add a dot/line inside the case if there is one
-            if (c.type !== types.empty)
-            {
-                let type = document.createElement("div")
-                type.className = c.type
-                type.style.backgroundColor = c.color
-                caseDiv.appendChild(type)
-            }
-        });
-    });
+        if (!flow.lineCompleted && flow.lines.length > 0)
+            drawLine(flow.corners.at(-1), flow.lines.at(-1), flow.color)
+    })
 }

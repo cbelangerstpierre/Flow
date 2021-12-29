@@ -1,12 +1,14 @@
-#root {
+#board {
     display: flex;
     flex-direction: column;
+    position: relative;
     
-    margin: auto;
-    border: 2px solid black;
-
     height: 600px;
     width: 600px;
+    margin: auto;
+    
+    border: 2px solid black;
+    user-select: none
 }
 
 .row {
@@ -14,6 +16,7 @@
     flex-direction: row;
 
     flex-grow: 1;
+    user-select: none;
 }
 
 .case {
@@ -22,22 +25,31 @@
 
     background-color: gray;
     border: 1px solid black;
+    user-select: none;
 }
 
 .dot {
     position: absolute;
-
+    top: 50%;
+    left: 50%;
     width: 70%;
     height: 70%;
     margin: 0;
-    top: 50%;
-    left: 50%;
 
     border-radius: 50%;
 
+    user-select: none;
     transform: translate(-50%, -50%);
 }
 
 .line {
     position: absolute;
+
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    right: 0;
+    top: 0;
+
+    user-select: none;
 }
