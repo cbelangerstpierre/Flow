@@ -178,7 +178,21 @@ function handleMouseMove(event)
     // Do nothing if didn't move
     if (pointsAreEqual(currentFlow.lines.at(-1), pos))
         return
-        
+
+    // Make sur the new line is a valid one
+    if (Math.abs(currentFlow.lines.at(-1).row - pos.row) > 1 ||
+        Math.abs(currentFlow.lines.at(-1).column - pos.column) > 1 ||
+        (currentFlow.lines.at(-1).row != pos.row && currentFlow.lines.at(-1).column != pos.column)
+    )
+    {
+        console.log("Invalid line. (line broke)")
+        currentFlow.lines = []
+        currentFlow.corners = []
+        currentFlow = undefined
+        drawLines()
+        return
+    }
+    
     // Add the corner if it is one
     if (currentFlow.corners.at(-1).row != pos.row && currentFlow.corners.at(-1).column != pos.column)
     {
