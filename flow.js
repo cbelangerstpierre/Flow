@@ -325,6 +325,7 @@ function showPoints()
 function drawLines()
 {
     const caseSize = parseInt(getComputedStyle(board).width.slice(0, -2)) / boardSize
+    const lineThickness = caseSize / 100 * 35
 
     let children = [ ...board.children ]
     // Remove all existing children
@@ -334,13 +335,17 @@ function drawLines()
             board.removeChild(child)
     }
 
-    const drawLine = (first, second, color) => {
+    const drawLine = (first, second, color, glow) => {
         let line = document.createElement("div")
         line.className = "line"
         line.style.backgroundColor = color
+        line.style.width = `${lineThickness}px`
+        line.style.height = `${lineThickness}px`
+        line.style.borderRadius = `${lineThickness / 2}px`
         board.appendChild(line)
-        let lineThickness = parseInt(getComputedStyle(line).width.slice(0, -2))
-
+        if (glow)
+            line.style.boxShadow = `0 0 ${lineThickness / 1.6}px 0 ${color}`
+        
         if (first.row == second.row)
         {
             line.style.width = `${caseSize * Math.abs(first.column - second.column) + lineThickness}px`
@@ -368,9 +373,22 @@ function drawLines()
 
     flows.forEach((flow) => {
         for (let i = 0; i < flow.corners.length - 1; i++)
-            drawLine(flow.corners[i], flow.corners[i + 1], flow.color)
+            drawLine(flow.corners[i], flow.corners[i + 1], flow.color, flow.lineCompleted)
 
         if (!flow.lineCompleted && flow.lines.length > 0)
-            drawLine(flow.corners.at(-1), flow.lines.at(-1), flow.color)
+            drawLine(flow.corners.at(-1), flow.lines.at(-1), flow.color, false)
+
+        // Make the points glow
+        if (flow.lineCompleted)
+        {
+            board.children[flow.first.row].children[flow.first.column].children[0].style.boxShadow = `0 0 ${lineThickness / 1.7}px 0 ${flow.color}`
+            board.children[flow.second.row].children[flow.second.column].children[0].style.boxShadow = `0 0 ${lineThickness / 1.7}px 0 ${flow.color}`
+        }
+
+        else
+        {
+            board.children[flow.first.row].children[flow.first.column].children[0].style.boxShadow = "none"
+            board.children[flow.second.row].children[flow.second.column].children[0].style.boxShadow = "none"
+        }
     })
 }
