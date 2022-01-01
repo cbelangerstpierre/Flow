@@ -1,0 +1,13 @@
+# TODO
+
+* Create a game where this is possible to win
+* Put a background image
+* Style all of this a bit
+
+Add :
+
+* a title
+* number of flows connected
+* percentage of the board filled
+* number of moves made ????
+* a refresh button that spawn a new map
