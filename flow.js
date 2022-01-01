@@ -121,10 +121,8 @@ function randomPoint()
 {
     let point = { row: Math.floor(Math.random() * boardSize), column: Math.floor(Math.random() * boardSize) }
 
-    flows.forEach((flow) => {
-        if (pointsAreEqual(flow.first, point) || pointsAreEqual(flow.second, point))
-            return randomPoint()
-    })
+    if (!flows.every((flow) => (!pointsAreEqual(flow.first, point) && !pointsAreEqual(flow.second, point))))
+        return randomPoint()
 
     console.log(`New point at (${point.row};${point.column})`)
     return point
