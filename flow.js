@@ -161,6 +161,22 @@ function getCaseClicked(x, y)
     console.warn("Can't find where the mouse clicked.")
 }
 
+
+/**
+ * Checks wheater the game is won or not
+ * @returns {boolean} If the board is completed
+ */
+function boardCompleted()
+{
+    if (!flows.every((flow) => flow.lineCompleted))
+        return false
+
+    let totalLines = 0
+    flows.forEach((flow) => { totalLines += flow.lines.length })
+    return totalLines == boardSize * boardSize
+}
+
+
 /**
  * Handles the mouse movements
  */
@@ -209,6 +225,8 @@ function handleMouseMove(event)
         currentFlow = undefined
         console.log("Line completed !!")
         drawLines()
+        if (boardCompleted())
+            console.log("Game won !")
         return
     }
 
