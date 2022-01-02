@@ -1,22 +1,52 @@
 const colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "silver", "lime", "chocolate", "crimson", "darksalmon", "orangered", "yellowgreen"]
 
-let board
-let flows = []
-let boardSize = 8
+let html
+let movesCounter
+let flows
+let boardSize
 let currentFlow
+let showSolution = false
+let timeStart
 
 
 window.addEventListener("load", () => {
-    board = document.getElementById("board")
+    html = { 
+        board: document.getElementById("board"),
+        flowsDone: document.getElementById("flowsDone"),
+        movesCounter: document.getElementById("movesCounter"),
+        percentDone: document.getElementById("percentDone"),
+        boardSize: document.getElementById("boardSize"),
+        popupGameFinished: document.getElementById("popupGameFinished"),
+        timeToFinishGame: document.getElementById("timeToFinishGame"),
+        moveToFinishGame: document.getElementById("moveToFinishGame"),
+        shareToClipboardToolTip: document.getElementById("shareToClipboardToolTip")
+    }
+    
+    let params = new URLSearchParams(location.search)
+    if (params.get("b"))
+    {
+        boardSize = params.get("b")
+        html.boardSize.value = boardSize
+    }
 
-    createGame()
+    if (params.get("f"))
+    {
+        reset()
+        timeStart = new Date()
+        flows = JSON.parse(params.get("f")).map((data) => { return { color: data[0], first: data[1], second: data[2], solution: data[3], corners: [], lines: [], lineCompleted: false } })
+    }
+    
+    else
+        createGame()
+
     drawPoints()
+    updateHtml()
 
-    // We can add "mousedown" or "mousemove"
-    board.addEventListener("mousedown", (event) => {
+    // When a point is clicked
+    html.board.addEventListener("mousedown", (event) => {
         let pos = getCaseClicked(event.clientX, event.clientY)
 
-        if (pos)
+        if (pos && !boardCompleted())
         {
             flows.forEach((flow) => {
                 if (pointsAreEqual(flow.first, pos) || pointsAreEqual(flow.second, pos))
@@ -30,34 +60,39 @@ window.addEventListener("load", () => {
         }
     })
 
+    // "mouseOut" is called on "MouseOp" or "MouseLeave"
     const mouseOut = () => {
         if (currentFlow)
         {
+            // Remove half-finished lines
             currentFlow.lines = []
             currentFlow.corners = []
             currentFlow = undefined
+            updateHtml()
             drawLines()
         }
     }
+    html.board.addEventListener("mouseup", mouseOut)
+    html.board.addEventListener("mouseleave", mouseOut)
 
-    board.addEventListener("mouseup", mouseOut)
-    board.addEventListener("mouseleave", mouseOut)
-
-    board.addEventListener("mousemove", handleMouseMove)
+    // "handleMouseMove" is always called on "MouseMove"
+    html.board.addEventListener("mousemove", handleMouseMove)
 })
 
 // Redraw lines when the window is resized
 window.addEventListener("resize", drawLines)
+
+
 
 /**
  * Create a new level
  */
 function createGame()
 {
-    resetBoard()
+    boardSize = parseInt(html.boardSize.value)
+    reset()
 
-    flows = []
-    colors.splice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
+    colors.slice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
         let solution = []
         for (let row = 0; row < boardSize; row++)
             solution.push({ row: row, column: i })
@@ -73,13 +108,6 @@ function createGame()
         })
     })
 
-    /**
-     * -Get random flow
-     * -Move one of his dot
-     * Move another flow that keeps the game possible
-     * -Repeat
-     */
-
     let directions = [
         [-1, 0],
         [1, 0],
@@ -90,7 +118,8 @@ function createGame()
     let iterationsMax = 10000
     for (let i = 0; i < iterationsMax;)
     {
-        let flow = flows.at(Math.floor(Math.random() * flows.length))
+        let validFlows = flows.filter((f) => f.solution.length < Math.pow(boardSize, 1.2))
+        let flow = validFlows.at(Math.floor(Math.random() * validFlows.length))
         let currentDot = (Math.floor(Math.random() * 2) == 0) ? flow.first : flow.second
 
         let direction = directions.at(Math.floor(Math.random() * 4))
@@ -100,7 +129,7 @@ function createGame()
 
         // If newDot is on an existing dot
         if (flows.filter((f) => f != flow).some((f) => {
-            if (f.solution.length < 3)
+            if (f.solution.length <= 3)
                 return false
 
             if(pointsAreEqual(f.first, newDot))
@@ -143,28 +172,32 @@ function createGame()
     
         for (let i = 1; i < solutionLine.length - 1; i++)
             if (solutionLine.at(i - 1).row != solutionLine.at(i + 1).row && solutionLine.at(i - 1).column != solutionLine.at(i + 1).column)
-                flow.solution.push(flow.solution.at(i))
+                flow.solution.push(solutionLine.at(i))
         
         flow.solution.push(flow.second)
     })
+
+    timeStart = new Date()
 }
 
 
 /**
  * Create a new board
  */
-function resetBoard()
+function reset()
 {
+    html.popupGameFinished.style.display = "none"
+    
     // Remove all existing children
-    while (board.firstChild)
-        board.removeChild(board.lastChild)
+    while (html.board.firstChild)
+        html.board.removeChild(html.board.lastChild)
 
     for (let i = 0; i < boardSize; i++)
     {
         // Create row
         let rowDiv = document.createElement("div")
         rowDiv.className = "row"
-        board.appendChild(rowDiv)
+        html.board.appendChild(rowDiv)
 
         for (let j = 0; j < boardSize; j++)
         {
@@ -174,6 +207,38 @@ function resetBoard()
             rowDiv.appendChild(caseDiv)
         }
     }
+
+    movesCounter = 0
+    flows = []
+    currentFlow = undefined
+    showSolution = false
+    updateHtml()
+}
+
+
+/**
+ * Share the current game via an url
+ */
+function shareGame()
+{
+    let share = []
+    flows.forEach((flow) => {
+        share.push([ flow.color, flow.first, flow.second, flow.solution ])
+    })
+    html.shareToClipboardToolTip.innerHTML = "Copied !"
+    navigator.clipboard.writeText(`${location.origin + location.pathname}?f=${JSON.stringify(share)}&b=${boardSize}`)
+}
+
+
+ /**
+ * Compare the position of two points
+ * @param {object} first A point
+ * @param {object} second A point
+ * @returns {boolean} If the two points are at the same position
+ */
+function pointsAreEqual(first, second)
+{
+    return first.row == second.row && first.column == second.column
 }
 
 
@@ -183,9 +248,9 @@ function resetBoard()
  * @param {object} second A point
  * @returns {boolean} If the two points are at the same position
  */
-function pointsAreEqual(first, second)
+function pointsAreNeighboors(first, second)
 {
-    return first.row == second.row && first.column == second.column
+    return (Math.abs(first.row - second.row) == 1 && first.column == second.column) || (Math.abs(first.column - second.column) == 1 && first.row == second.row)
 }
 
 
@@ -200,13 +265,11 @@ function getCaseClicked(x, y)
     for (let row = 0; row < boardSize; row++)
         for (let column = 0; column < boardSize; column++)
         {
-            let rect = board.children[row].children[column].getBoundingClientRect()
+            let rect = html.board.children[row].children[column].getBoundingClientRect()
             // If the (x,y) is inside the current case
             if (rect.top <= y && y <= rect.bottom && rect.left <= x && x <= rect.right)
                 return { row: row, column: column }
         }
-
-    console.warn("Can't find where the mouse clicked.")
 }
 
 
@@ -247,20 +310,17 @@ function handleMouseMove(event)
         (currentFlow.lines.at(-1).row != pos.row && currentFlow.lines.at(-1).column != pos.column)
     )
     {
-        console.log("Invalid line. (line broke)")
         currentFlow.lines = []
         currentFlow.corners = []
         currentFlow = undefined
+        updateHtml()
         drawLines()
         return
     }
     
     // Add the corner if it is one
     if (currentFlow.corners.at(-1).row != pos.row && currentFlow.corners.at(-1).column != pos.column)
-    {
-        console.log(currentFlow.lines.at(-1), "is a corner")
         currentFlow.corners.push(currentFlow.lines.at(-1))
-    }
 
     // Finish flow if we touch other point
     if ((pointsAreEqual(currentFlow.second, pos) && pointsAreEqual(currentFlow.first, currentFlow.corners.at(0))) // We are at second point and started at first point
@@ -271,10 +331,17 @@ function handleMouseMove(event)
         currentFlow.lines.push(pos)
         currentFlow.lineCompleted = true
         currentFlow = undefined
-        console.log("Line completed !!")
+        movesCounter += 1
+        updateHtml()
         drawLines()
+
+        // If the game is won
         if (boardCompleted())
-            console.log("Game won !")
+        {
+            html.popupGameFinished.style.display = "flex"
+            html.timeToFinishGame.innerText = `You took ${Math.round((new Date().getTime() - timeStart.getTime()) / 1000)} seconds to complete this level.`
+            html.moveToFinishGame.innerText = `You succeed with ${movesCounter} moves.`
+        }
         return
     }
 
@@ -300,7 +367,7 @@ function handleMouseMove(event)
         })
     )
     {
-        console.log("Line wrap")
+        updateHtml()
         drawLines()
         return
     }
@@ -311,10 +378,10 @@ function handleMouseMove(event)
         })
     )
     {
-        console.log("Touched another color point")
         currentFlow.lines = []
         currentFlow.corners = []
         currentFlow = undefined
+        updateHtml()
         drawLines()
         return
     }
@@ -334,19 +401,40 @@ function handleMouseMove(event)
         })
     )
     {
-        console.log("Touched another color line")
         currentFlow.lines = []
         currentFlow.corners = []
         currentFlow = undefined
+        updateHtml()
         drawLines()
         return
     }
 
     // Add the current pos to lines
     currentFlow.lines.push(pos)
+    updateHtml()
     drawLines()
 }
 
+
+/**
+ * Toggle the visibility of the solution
+ */
+ function toggleSolution()
+ {
+    showSolution = !showSolution
+    drawLines()
+}
+
+
+/**
+ * Update the HTML's statistics
+ */
+function updateHtml()
+{
+    html.flowsDone.innerText = `Flows: ${flows.filter((f) => f.lineCompleted).length}/${boardSize}`
+    html.movesCounter.innerText = `Moves: ${movesCounter}`
+    html.percentDone.innerText = `Pipe: ${Math.floor(flows.reduce((prev, current) => prev + current.lines.length, 0) / (boardSize * boardSize) * 100)}%`
+}
 
 /**
  * Create points into the HTML
@@ -357,7 +445,7 @@ function drawPoints()
         let point = document.createElement("div")
         point.className = "dot"
         point.style.backgroundColor = color
-        board.children[pos.row].children[pos.column].appendChild(point)
+        html.board.children[pos.row].children[pos.column].appendChild(point)
     }
     
     flows.forEach((flow) => {
@@ -372,15 +460,15 @@ function drawPoints()
  */
 function drawLines()
 {
-    const caseSize = parseInt(getComputedStyle(board).width.slice(0, -2)) / boardSize
+    const caseSize = parseInt(getComputedStyle(html.board).width.slice(0, -2)) / boardSize
     const lineThickness = caseSize / 100 * 35
 
-    let children = [ ...board.children ]
+    let children = [ ...html.board.children ]
     // Remove all existing children
     for (let child of children)
     {
         if (child.className == "line")
-            board.removeChild(child)
+            html.board.removeChild(child)
     }
 
     const drawLine = (first, second, color, glow) => {
@@ -390,7 +478,7 @@ function drawLines()
         line.style.width = `${lineThickness}px`
         line.style.height = `${lineThickness}px`
         line.style.borderRadius = `${lineThickness / 2}px`
-        board.appendChild(line)
+        html.board.appendChild(line)
         if (glow)
             line.style.boxShadow = `0 0 ${lineThickness / 1.6}px 0 ${color}`
         
@@ -420,23 +508,31 @@ function drawLines()
     }
 
     flows.forEach((flow) => {
-        for (let i = 0; i < flow.corners.length - 1; i++)
-            drawLine(flow.corners[i], flow.corners[i + 1], flow.color, flow.lineCompleted)
+        if (showSolution)
+            for (let i = 0; i < flow.solution.length - 1; i++)
+                drawLine(flow.solution[i], flow.solution[i + 1], flow.color, false)
 
-        if (!flow.lineCompleted && flow.lines.length > 0)
-            drawLine(flow.corners.at(-1), flow.lines.at(-1), flow.color, false)
+        else
+        {
+            for (let i = 0; i < flow.corners.length - 1; i++)
+                drawLine(flow.corners[i], flow.corners[i + 1], flow.color, flow.lineCompleted)
+    
+            if (!flow.lineCompleted && flow.lines.length > 0)
+                drawLine(flow.corners.at(-1), flow.lines.at(-1), flow.color, false)
+                
+        }
 
         // Make the points glow
-        if (flow.lineCompleted)
+        if (flow.lineCompleted && !showSolution)
         {
-            board.children[flow.first.row].children[flow.first.column].children[0].style.boxShadow = `0 0 ${lineThickness / 1.7}px 0 ${flow.color}`
-            board.children[flow.second.row].children[flow.second.column].children[0].style.boxShadow = `0 0 ${lineThickness / 1.7}px 0 ${flow.color}`
+            html.board.children[flow.first.row].children[flow.first.column].children[0].style.boxShadow = `0 0 ${lineThickness / 1.7}px 0 ${flow.color}`
+            html.board.children[flow.second.row].children[flow.second.column].children[0].style.boxShadow = `0 0 ${lineThickness / 1.7}px 0 ${flow.color}`
         }
 
         else
         {
-            board.children[flow.first.row].children[flow.first.column].children[0].style.boxShadow = "none"
-            board.children[flow.second.row].children[flow.second.column].children[0].style.boxShadow = "none"
+            html.board.children[flow.first.row].children[flow.first.column].children[0].style.boxShadow = "none"
+            html.board.children[flow.second.row].children[flow.second.column].children[0].style.boxShadow = "none"
         }
     })
 }
