@@ -52,7 +52,7 @@ window.addEventListener("load", () => {
     html.board.addEventListener("mousedown", (event) => {
         let pos = getCaseClicked(event.clientX, event.clientY)
 
-        if (pos && !boardCompleted())
+        if (pos && !showSolution && !boardCompleted())
         {
             flows.forEach((flow) => {
                 if (pointsAreEqual(flow.first, pos) || pointsAreEqual(flow.second, pos))
