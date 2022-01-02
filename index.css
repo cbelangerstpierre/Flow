@@ -20,6 +20,7 @@ body {
   width: var(--game-size);
 
   background: rgb(15, 15, 15);
+  font-size: 1.3rem;
 }
 
 #board {
@@ -106,12 +107,11 @@ body {
 }
 
 select {
-  width: 2rem;
-  text-align: center;
+  width: 2.5rem;
   background: transparent;
   color: white;
   border: none;
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 option {
@@ -122,7 +122,7 @@ button {
   background: transparent;
   color: white;
   border: none;
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 button:hover {
