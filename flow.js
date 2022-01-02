@@ -33,7 +33,13 @@ window.addEventListener("load", () => {
     {
         reset()
         timeStart = new Date()
-        flows = JSON.parse(params.get("f")).map((data) => { return { color: data[0], first: data[1], second: data[2], solution: data[3], corners: [], lines: [], lineCompleted: false } })
+        flows = JSON.parse(params.get("f")).map((data) => { 
+            let solution = []
+            for (let i = 0; i < data[3]; i += 2)
+                solution.push({ row: data[5][i], column: data[5][i + 1] })
+
+            return { color: colors.at(data[0]), first: { row: data[1], column: data[2] }, second: { row: data[3], column: data[4] }, solution: solution, corners: [], lines: [], lineCompleted: false } 
+        })
     }
     
     else
@@ -223,7 +229,12 @@ function shareGame()
 {
     let share = []
     flows.forEach((flow) => {
-        share.push([ flow.color, flow.first, flow.second, flow.solution ])
+        let solution = []
+        flow.solution.forEach((s) => {
+            solution.push(s.row)
+            solution.push(s.column)
+        })
+        share.push([ colors.indexOf(flow.color), flow.first.row, flow.first.column, flow.second.row, flow.second.column, solution ])
     })
     html.shareToClipboardToolTip.innerHTML = "Copied !"
     navigator.clipboard.writeText(`${location.origin + location.pathname}?f=${JSON.stringify(share)}&b=${boardSize}`)
