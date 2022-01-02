@@ -35,7 +35,7 @@ window.addEventListener("load", () => {
         timeStart = new Date()
         flows = JSON.parse(params.get("f")).map((data) => { 
             let solution = []
-            for (let i = 0; i < data[3]; i += 2)
+            for (let i = 0; i < data[5].length; i += 2)
                 solution.push({ row: data[5][i], column: data[5][i + 1] })
 
             return { color: colors.at(data[0]), first: { row: data[1], column: data[2] }, second: { row: data[3], column: data[4] }, solution: solution, corners: [], lines: [], lineCompleted: false } 
