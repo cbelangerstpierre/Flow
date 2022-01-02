@@ -1,4 +1,4 @@
-const colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink"]
+const colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "silver", "lime", "chocolate", "crimson", "darksalmon", "orangered", "yellowgreen"]
 
 let board
 let flows = []
@@ -10,7 +10,7 @@ window.addEventListener("load", () => {
     board = document.getElementById("board")
 
     createGame()
-    showPoints()
+    drawPoints()
 
     // We can add "mousedown" or "mousemove"
     board.addEventListener("mousedown", (event) => {
@@ -46,33 +46,114 @@ window.addEventListener("load", () => {
     board.addEventListener("mousemove", handleMouseMove)
 })
 
+// Redraw lines when the window is resized
+window.addEventListener("resize", drawLines)
 
 /**
  * Create a new level
  */
 function createGame()
 {
-    drawBoard()
-    createPoints()
+    resetBoard()
 
-    // let simFlows = []
+    flows = []
+    colors.splice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
+        let solution = []
+        for (let row = 0; row < boardSize; row++)
+            solution.push({ row: row, column: i })
 
-    // colors.forEach((color, i) => {
-    //     simFlows.push({
-    //         color: color,
-    //         first: { row: 0, column: i },
-    //         second: { row: boardSize - 1, column: i },
-    //         corners: [],
-    //         lineCompleted: false
-    //     })
-    // })
+        flows.push({
+            color: color,
+            first: { row: 0, column: i },
+            second: { row: boardSize - 1, column: i },
+            corners: [],
+            lines: [],
+            lineCompleted: false,
+            solution: solution
+        })
+    })
+
+    /**
+     * -Get random flow
+     * -Move one of his dot
+     * Move another flow that keeps the game possible
+     * -Repeat
+     */
+
+    let directions = [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1]
+    ]
+    
+    let iterationsMax = 10000
+    for (let i = 0; i < iterationsMax;)
+    {
+        let flow = flows.at(Math.floor(Math.random() * flows.length))
+        let currentDot = (Math.floor(Math.random() * 2) == 0) ? flow.first : flow.second
+
+        let direction = directions.at(Math.floor(Math.random() * 4))
+        let newDot = { row: currentDot.row + direction.at(0), column: currentDot.column + direction.at(1) }
+        if (newDot.row < 0 || newDot.row >= boardSize || newDot.column < 0 || newDot.column >= boardSize)
+            continue
+
+        // If newDot is on an existing dot
+        if (flows.filter((f) => f != flow).some((f) => {
+            if (f.solution.length < 3)
+                return false
+
+            if(pointsAreEqual(f.first, newDot))
+            {
+                f.first = f.solution.at(1)
+                f.solution.shift()
+                return true
+            }
+            
+            else if (pointsAreEqual(f.second, newDot))
+            {
+                f.second = f.solution.at(-2)
+                f.solution.pop()
+                return true
+            }
+        }))
+        {
+            if (pointsAreEqual(flow.first, currentDot))
+            {
+                flow.first = newDot
+                flow.solution.unshift(newDot)
+            }
+
+            else // if (pointsAreEqual(flow.second, currentDot))
+            {
+                flow.second = newDot
+                flow.solution.push(newDot)
+            }
+
+            i += 1
+        }
+    }
+    
+    // Finds the corners in the newly created lines (flow.solution)
+    flows.forEach((flow) => {
+        let solutionLine = flow.solution
+        flow.solution = []
+
+        flow.solution.push(flow.first)
+    
+        for (let i = 1; i < solutionLine.length - 1; i++)
+            if (solutionLine.at(i - 1).row != solutionLine.at(i + 1).row && solutionLine.at(i - 1).column != solutionLine.at(i + 1).column)
+                flow.solution.push(flow.solution.at(i))
+        
+        flow.solution.push(flow.second)
+    })
 }
 
 
 /**
  * Create a new board
  */
-function drawBoard()
+function resetBoard()
 {
     // Remove all existing children
     while (board.firstChild)
@@ -93,39 +174,6 @@ function drawBoard()
             rowDiv.appendChild(caseDiv)
         }
     }
-}
-
-
-/**
- * Add a random pair of points for each color
- */
-function createPoints()
-{
-    colors.forEach((color) => {
-        flows.push({
-            color: color,
-            first: randomPoint(),
-            second: randomPoint(),
-            corners: [],
-            lines: [],
-            lineCompleted: false
-        })
-    });
-}
-
-
-/**
- * Generates a random point
- */
-function randomPoint()
-{
-    let point = { row: Math.floor(Math.random() * boardSize), column: Math.floor(Math.random() * boardSize) }
-
-    if (!flows.every((flow) => (!pointsAreEqual(flow.first, point) && !pointsAreEqual(flow.second, point))))
-        return randomPoint()
-
-    console.log(`New point at (${point.row};${point.column})`)
-    return point
 }
 
 
@@ -303,7 +351,7 @@ function handleMouseMove(event)
 /**
  * Create points into the HTML
  */
-function showPoints()
+function drawPoints()
 {
     let showPoint = (pos, color) => {
         let point = document.createElement("div")
