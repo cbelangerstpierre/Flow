@@ -1,168 +1,154 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap");
-
 * {
-  font-family: "Poppins", "sans-serif";
-  margin: 0;
-  padding: 0;
-  text-align: center;
-
-  --white: rgb(240, 240, 240);
-  --game-size: 75vh;
+    font-family: "Poppins", "sans-serif";
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    --white: rgb(240, 240, 240);
+    --game-size: 75vh;
 }
 
 :root {
-  color: var(--white);
-  font-size: 20px;
+    color: var(--white);
+    font-size: 20px;
 }
 
 body {
-  margin: auto;
-  width: var(--game-size);
-
-  background: rgb(15, 15, 15);
-  font-size: 1.3rem;
+    margin: auto;
+    width: var(--game-size);
+    background: rgb(15, 15, 15);
+    font-size: 1.3rem;
 }
 
 #board {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-
-  height: var(--game-size);
-  width: var(--game-size);
-
-  background-color: black;
-  outline: 0.1rem solid #848484;
-  user-select: none;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: var(--game-size);
+    width: var(--game-size);
+    background-color: black;
+    outline: 0.1rem solid #848484;
+    user-select: none;
 }
 
 .vertical {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
-.vertical > * {
-  white-space: nowrap;
+.vertical>* {
+    white-space: nowrap;
 }
 
 .row {
-  display: flex;
-  flex-direction: row;
-
-  flex-grow: 1;
-  user-select: none;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    user-select: none;
 }
 
 .case {
-  position: relative;
-  flex-grow: 1;
-
-  border: 0.05rem solid #848484;
-  user-select: none;
+    position: relative;
+    flex-grow: 1;
+    border: 0.05rem solid #848484;
+    user-select: none;
 }
 
 .dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 70%;
-  height: 70%;
-  margin: 0;
-
-  border-radius: 50%;
-
-  user-select: none;
-  transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70%;
+    height: 70%;
+    margin: 0;
+    border-radius: 50%;
+    user-select: none;
+    transform: translate(-50%, -50%);
 }
 
 .changeSize {
-  display: flex;
-  gap: 0.5em;
+    display: flex;
+    gap: 0.5em;
 }
 
 .line {
-  position: absolute;
-  right: 0;
-  top: 0;
-
-  user-select: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    user-select: none;
 }
 
 #popupGameFinished {
-  display: none;
-  flex-direction: column;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  gap: 0.5rem;
-  width: calc(var(--game-size) / 2);
-  padding: 1rem;
-
-  border: 0.2rem solid #848484;
-  background-color: rgb(15, 15, 15);
-  z-index: 10;
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    gap: 0.5rem;
+    width: calc(var(--game-size) / 2);
+    padding: 1rem;
+    border: 0.2rem solid #848484;
+    background-color: rgb(15, 15, 15);
+    z-index: 10;
 }
 
 select {
-  width: 2.5rem;
-  background: transparent;
-  color: white;
-  border: none;
-  font-size: 1em;
+    width: 2.5rem;
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 1em;
 }
 
 option {
-  background: black;
+    background: black;
 }
 
 button {
-  background: transparent;
-  color: white;
-  border: none;
-  font-size: 1em;
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 1em;
 }
 
 button:hover {
-  font-weight: bold;
-  cursor: pointer;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .tooltip {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .tooltip #shareToClipboardToolTip {
-  position: absolute;
-  width: 8rem;
-  text-align: center;
-  border-radius: 1rem;
-  bottom: 150%;
-  left: 50%;
-  transform: translate(-50%);
-  
-  background-color: #848484;
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.2s;
-  z-index: 100;
+    position: absolute;
+    width: 8rem;
+    text-align: center;
+    border-radius: 1rem;
+    bottom: 150%;
+    left: 50%;
+    transform: translate(-50%);
+    background-color: #848484;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 100;
 }
 
 .tooltip #shareToClipboardToolTip::after {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate(-50%);
-  content: "";
-  
-  border: 0.5rem solid transparent;
-  border-top-color: #848484;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%);
+    content: "";
+    border: 0.5rem solid transparent;
+    border-top-color: #848484;
 }
 
-#shareButton:hover + #shareToClipboardToolTip {
-  visibility: visible;
-  opacity: 1;
+#shareButton:hover+#shareToClipboardToolTip {
+    visibility: visible;
+    opacity: 1;
 }
