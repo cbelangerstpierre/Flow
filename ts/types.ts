@@ -20,3 +20,15 @@ enum Color {
   orangered,
   yellowgreen,
 }
+
+type HtmlElements = {
+  board: HTMLDivElement;
+  flowsDone: HTMLParagraphElement;
+  movesCounter: HTMLParagraphElement;
+  percentDone: HTMLParagraphElement;
+  boardSize: HTMLSelectElement;
+  popupGameFinished: HTMLDivElement;
+  timeToFinishGame: HTMLParagraphElement;
+  moveToFinishGame: HTMLParagraphElement;
+  shareToClipboardToolTip: HTMLSpanElement;
+};
