@@ -1,28 +1,13 @@
-const colors = ["red", "orange", "yellow", "green", "cyan", "blue", "purple", "pink", "silver", "lime", "chocolate", "crimson", "darksalmon", "orangered", "yellowgreen"]
 
-let html
 let movesCounter
 let flows
-let boardSize
 let currentFlow
 let showSolution = false
 let timeStart
 
-
 window.addEventListener("load", () => {
-    html = {
-        board: document.getElementById("board"),
-        flowsDone: document.getElementById("flowsDone"),
-        movesCounter: document.getElementById("movesCounter"),
-        percentDone: document.getElementById("percentDone"),
-        boardSize: document.getElementById("boardSize"),
-        popupGameFinished: document.getElementById("popupGameFinished"),
-        timeToFinishGame: document.getElementById("timeToFinishGame"),
-        moveToFinishGame: document.getElementById("moveToFinishGame"),
-        shareToClipboardToolTip: document.getElementById("shareToClipboardToolTip")
-    }
-
     let params = new URLSearchParams(location.search)
+    let boardSize: number;
     if (params.get("b")) {
         boardSize = params.get("b")
         html.boardSize.value = boardSize
@@ -79,18 +64,15 @@ window.addEventListener("load", () => {
 })
 
 // Redraw lines when the window is resized
-window.addEventListener("resize", drawLines)
-
-
+window.addEventListener("resize", drawLines);
 
 /**
  * Create a new level
  */
 function createGame() {
-    boardSize = parseInt(html.boardSize.value)
+    let boardSize = parseInt(html.boardSize.value)
     reset()
-
-    colors.slice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
+    Object.values(Color).slice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
         let solution = []
         for (let row = 0; row < boardSize; row++)
             solution.push({ row: row, column: i })
@@ -178,7 +160,7 @@ function reset() {
 
     // Remove all existing children
     while (html.board.firstChild)
-        html.board.removeChild(html.board.lastChild)
+        html.board.removeChild(html.board.lastChild as Node)
 
     for (let i = 0; i < boardSize; i++) {
         // Create row
