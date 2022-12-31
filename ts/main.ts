@@ -1,10 +1,9 @@
+
 let movesCounter
 let flows
 let currentFlow
 let showSolution = false
 let timeStart
-
-// let game = new Game(3);
 
 window.addEventListener("load", () => {
     let params = new URLSearchParams(location.search)
@@ -71,10 +70,9 @@ window.addEventListener("resize", drawLines);
  * Create a new level
  */
 function createGame() {
-    boardSize = parseInt(html.boardSize.value)
+    let boardSize = parseInt(html.boardSize.value)
     reset()
-
-    colors.slice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
+    Object.values(Color).slice(0, boardSize).sort(() => Math.floor(Math.random() * 3) - 1).forEach((color, i) => {
         let solution = []
         for (let row = 0; row < boardSize; row++)
             solution.push({ row: row, column: i })
