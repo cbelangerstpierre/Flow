@@ -1,4 +1,16 @@
-const html: Object = {
+type HtmlElements = {
+  board: HTMLDivElement;
+  flowsDone: HTMLParagraphElement;
+  movesCounter: HTMLParagraphElement;
+  percentDone: HTMLParagraphElement;
+  boardSize: HTMLSelectElement;
+  popupGameFinished: HTMLDivElement;
+  timeToFinishGame: HTMLParagraphElement;
+  moveToFinishGame: HTMLParagraphElement;
+  shareToClipboardToolTip: HTMLSpanElement;
+};
+
+const html: HtmlElements = {
   board: document.getElementById("board") as HTMLDivElement,
   flowsDone: document.getElementById("flowsDone") as HTMLParagraphElement,
   movesCounter: document.getElementById("movesCounter") as HTMLParagraphElement,
