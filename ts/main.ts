@@ -1,6 +1,3 @@
-console.log(5);
-console.log(html);
-
 let movesCounter
 let flows
 let currentFlow
@@ -9,7 +6,6 @@ let timeStart
 
 // let game = new Game(3);
 
-html.board;
 window.addEventListener("load", () => {
     let params = new URLSearchParams(location.search)
     let boardSize: number;
@@ -69,8 +65,7 @@ window.addEventListener("load", () => {
 })
 
 // Redraw lines when the window is resized
-window.addEventListener("resize", drawLines)
-
+window.addEventListener("resize", drawLines);
 
 /**
  * Create a new level

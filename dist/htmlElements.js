@@ -1,5 +1,5 @@
 "use strict";
-let html = {
+const html = {
     board: document.getElementById("board"),
     flowsDone: document.getElementById("flowsDone"),
     movesCounter: document.getElementById("movesCounter"),
@@ -8,5 +8,5 @@ let html = {
     popupGameFinished: document.getElementById("popupGameFinished"),
     timeToFinishGame: document.getElementById("timeToFinishGame"),
     moveToFinishGame: document.getElementById("moveToFinishGame"),
-    shareToClipboardToolTip: document.getElementById("shareToClipboardToolTip")
+    shareToClipboardToolTip: document.getElementById("shareToClipboardToolTip"),
 };
