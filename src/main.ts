@@ -37,8 +37,9 @@ function init() {
     createGame();
     return;
   }
-  game.boardSize = +params.get("b")!;
-  html.boardSize.value = params.get("b")!;
+  const boardSize: string = params.get("b")!;
+  game.boardSize = +boardSize;
+  html.boardSize.value = boardSize;
   reset();
   game.flows = JSON.parse(params.get("f")!).map((data: Share) => {
     let solution = [];
@@ -181,7 +182,7 @@ function drawLines() {
 
   let children = [...html.board.children];
   for (let child of children) {
-    if (child.className == "line") html.board.removeChild(child);
+    if (child.className === "line") html.board.removeChild(child);
   }
 
   const drawLine = (
@@ -204,13 +205,13 @@ function drawLines() {
     line.style.borderRadius = `${lineThickness / 2}px`;
     html.board.appendChild(line);
     if (glow) line.style.boxShadow = `0 0 ${lineThickness / 1.6}px 0 ${color}`;
-    if (first.row == second.row) {
+    if (first.row === second.row) {
       line.style.width = getDimension(first.column, second.column);
       line.style.top = getSpacing(first.row);
       if (first.column < second.column)
         line.style.left = getSpacing(first.column);
       else line.style.left = getSpacing(second.column);
-    } else if (first.column == second.column) {
+    } else if (first.column === second.column) {
       line.style.height = getDimension(first.row, second.row);
       line.style.left = getSpacing(first.column);
       if (first.row < second.row) line.style.top = getSpacing(first.row);

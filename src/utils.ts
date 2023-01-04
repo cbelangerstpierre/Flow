@@ -13,7 +13,7 @@ export function getValidFlow(flows: Flow[], boardSize: number): Flow {
     (f: Flow) => f.solution.length < Math.pow(boardSize, 1.2)
   );
 
-  return validFlows.at(Math.floor(Math.random() * validFlows.length))!;
+  return validFlows[Math.floor(Math.random() * validFlows.length)];
 }
 
 export function isCorner(pos: Point, flow: Flow): boolean {
@@ -47,9 +47,9 @@ export function touchingOtherFlowDot(
   pos: Point
 ): boolean {
   return !flows
-    .filter((f: Flow) => f != flow)
+    .filter((f: Flow) => f !== flow)
     .every((f: Flow) => {
-      return !(pointsAreEqual(f.start, pos!) || pointsAreEqual(f.end, pos!));
+      return !(pointsAreEqual(f.start, pos) || pointsAreEqual(f.end, pos));
     });
 }
 
@@ -62,7 +62,7 @@ export function touchingOtherFlowLine(
     .filter((f: Flow) => f !== flow)
     .every((f: Flow) => {
       return f.lines.every((c: Point) => {
-        if (pointsAreEqual(c, pos!)) {
+        if (pointsAreEqual(c, pos)) {
           flow.lines = [];
           flow.corners = [];
           return false;
@@ -106,20 +106,21 @@ export function isInvalidNewDot(newDot: Point, boardSize: number): boolean {
 }
 
 export function isValidNewLine(pos: Point, flow: Flow): boolean {
+  if (flow.lines.length < 1) return false;
   return !(
-    Math.abs(flow.lines.at(-1)!.row - pos.row) > 1 ||
-    Math.abs(flow.lines.at(-1)!.column - pos.column) > 1 ||
-    (flow.lines.at(-1)!.row !== pos.row &&
-      flow.lines.at(-1)!.column !== pos.column)
+    Math.abs(flow.lines[-1].row - pos.row) > 1 ||
+    Math.abs(flow.lines[-1].column - pos.column) > 1 ||
+    (flow.lines[-1].row !== pos.row && flow.lines[-1].column !== pos.column)
   );
 }
 
 export function isfinishFlow(pos: Point, flow: Flow): boolean {
+  if (flow.corners.length < 1) return false;
   return (
     (pointsAreEqual(flow.end, pos) &&
-      pointsAreEqual(flow.start, flow.corners.at(0)!)) ||
+      pointsAreEqual(flow.start, flow.corners[0])) ||
     (pointsAreEqual(flow.start, pos) &&
-      pointsAreEqual(flow.end, flow.corners.at(0)!))
+      pointsAreEqual(flow.end, flow.corners[0]))
   );
 }
 
