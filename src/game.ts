@@ -44,7 +44,6 @@ export class Game {
       const flow: Flow = getValidFlow(this.flows, this.boardSize);
       const currentDot: Point =
         Math.floor(Math.random() * 2) === 0 ? flow.start : flow.end;
-
       const direction: Direction = directions.at(
         Math.floor(Math.random() * directions.length)
       )!;

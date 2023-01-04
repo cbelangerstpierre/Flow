@@ -9,7 +9,7 @@ export const directions: Direction[] = [
 ];
 
 export function getValidFlow(flows: Flow[], boardSize: number): Flow {
-  let validFlows: Flow[] = flows.filter(
+  const validFlows: Flow[] = flows.filter(
     (f: Flow) => f.solution.length < Math.pow(boardSize, 1.2)
   );
 
@@ -18,18 +18,16 @@ export function getValidFlow(flows: Flow[], boardSize: number): Flow {
 
 export function isCorner(pos: Point, flow: Flow): boolean {
   return (
-    flow.corners.at(-1)?.row != pos.row &&
-    flow.corners.at(-1)?.column != pos.column
+    flow.corners.at(-1)?.row !== pos.row &&
+    flow.corners.at(-1)?.column !== pos.column
   );
 }
 
 export function noLineWrap(flow: Flow, pos: Point): boolean {
   return !flow.lines.every((point: Point) => {
     if (pointsAreEqual(point, pos)) {
-      while (!pointsAreEqual(flow.lines.at(-1)!, point)) {
-        let removedPoint: Point = flow.lines.pop()!;
-
-        // Remove the corner if we removed the point
+      while (!pointsAreEqual(flow.lines.at(-1), point)) {
+        const removedPoint: Point | undefined = flow.lines.pop();
         flow.corners.forEach((corner: Point) => {
           if (pointsAreEqual(corner, removedPoint))
             flow.corners.splice(flow.corners.indexOf(corner), 1);
@@ -85,13 +83,13 @@ export function isOnAnotherDot(
     .some((f: Flow) => {
       if (f.solution.length <= 3) return false;
 
-      if (pointsAreEqual(f.start, newDot)) {
-        f.start = f.solution.at(1)!;
+      if (pointsAreEqual(f.start, newDot) && f.solution.length >= 1) {
+        f.start = f.solution[1];
         f.solution.shift();
         return true;
       }
-      if (pointsAreEqual(f.end, newDot)) {
-        f.end = f.solution.at(-2)!;
+      if (pointsAreEqual(f.end, newDot) && f.solution.length >= 2) {
+        f.end = f.solution[-2];
         f.solution.pop();
         return true;
       }
@@ -125,7 +123,8 @@ export function isfinishFlow(pos: Point, flow: Flow): boolean {
   );
 }
 
-export function pointsAreEqual(start: Point, end: Point): boolean {
+export function pointsAreEqual(start?: Point, end?: Point): boolean {
+  if (!start || !end) return false;
   return start.row === end.row && start.column === end.column;
 }
 
