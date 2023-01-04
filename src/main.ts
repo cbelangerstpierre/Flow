@@ -132,7 +132,7 @@ function handleMouseMove(event: { clientX: number; clientY: number }): void {
   if (!game.currentFlow || game.currentFlow === undefined) return;
   let pos = getCaseClicked(event.clientX, event.clientY);
   if (!pos || pos === undefined) return;
-  if (pointsAreEqual(game.currentFlow.lines.at(-1)!, pos)) return;
+  if (pointsAreEqual(game.currentFlow.lines[-1], pos)) return;
   game.handleMouseMove(pos, game.currentFlow);
   if (game.isBoardCompleted()) gameWon();
   updateHtml();
@@ -238,8 +238,8 @@ function drawLines() {
 
       if (!flow.completed && flow.lines.length > 0)
         drawLine(
-          flow.corners.at(-1)!,
-          flow.lines.at(-1)!,
+          flow.corners[-1],
+          flow.lines[-1],
           Color[flow.color],
           false
         );

@@ -44,12 +44,11 @@ export class Game {
       const flow: Flow = getValidFlow(this.flows, this.boardSize);
       const currentDot: Point =
         Math.floor(Math.random() * 2) === 0 ? flow.start : flow.end;
-      const direction: Direction = directions.at(
-        Math.floor(Math.random() * directions.length)
-      )!;
+      const direction: Direction =
+        directions[Math.floor(Math.random() * directions.length)];
       const newDot: Point = {
-        row: currentDot.row + direction.at(0)!,
-        column: currentDot.column + direction.at(1)!,
+        row: currentDot.row + direction[0],
+        column: currentDot.column + direction[1],
       };
 
       if (isInvalidNewDot(newDot, this.boardSize)) {
@@ -79,10 +78,10 @@ export class Game {
       // Start at 1 and finish to 1 less since we want to access the one before and one after every time
       for (let i = 1; i < solutionLine.length - 1; i++)
         if (
-          solutionLine.at(i - 1)!.row != solutionLine.at(i + 1)!.row &&
-          solutionLine.at(i - 1)!.column != solutionLine.at(i + 1)!.column
+          solutionLine[i - 1].row !== solutionLine[i + 1]!.row &&
+          solutionLine[i - 1].column !== solutionLine[i + 1]!.column
         ) {
-          flow.solution.push(solutionLine.at(i)!);
+          flow.solution.push(solutionLine[i]);
         }
 
       flow.solution.push(flow.end);
@@ -159,7 +158,7 @@ export class Game {
       return;
     }
 
-    if (isCorner(pos, flow)) flow.corners.push(flow.lines.at(-1)!);
+    if (isCorner(pos, flow)) flow.corners.push(flow.lines[-1]);
 
     if (isfinishFlow(pos, flow)) {
       this.finishFlow(pos, flow);
