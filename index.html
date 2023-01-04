@@ -1,54 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flow</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css" />
     <script type="module" src="dist/main.js" defer></script>
-</head>
-<body>
+  </head>
+  <body>
     <div id="popupGameFinished">
-        <h2>Game won !</h2>
-        <p id="moveToFinishGame">You succeed with x moves.</p>
-        <p id="timeToFinishGame">You took x seconds to complete this level.</p>
-        <button id="newLevelButtonEnd">New level</button>
-        <div class="tooltip">
-            <button id="shareButton">
-                Share this level
-            </button>
-            <span id="shareToClipboardToolTip">Copy url</span>
-        </div>
+      <h2>Game won !</h2>
+      <p id="moveToFinishGame">You succeed with x moves.</p>
+      <p id="timeToFinishGame">You took x seconds to complete this level.</p>
+      <button id="newLevelButtonEnd">New level</button>
+      <div class="tooltip">
+        <button id="shareButton">Share this level</button>
+        <span id="shareToClipboardToolTip">Copy url</span>
+      </div>
     </div>
 
     <h1>Flow</h1>
     <div class="vertical">
-        <p id="flowsDone">Flows: 0/0</p>
-        <p id="movesCounter">Moves: 0</p>
-        <p id="percentDone">Pipe: 0%</p>
+      <p id="flowsDone">Flows: 0/0</p>
+      <p id="movesCounter">Moves: 0</p>
+      <p id="percentDone">Pipe: 0%</p>
     </div>
     <div id="board"></div>
     <div class="vertical">
-        <div class="changeSize">
-            <p>Board size: </p>
-            <select name="Board size" id="boardSize">
-                <option>4</option>
-                <option>5</option>
-                <option>6</option>
-                <option>7</option>
-                <option selected>8</option>
-                <option>9</option>
-                <option>10</option>
-                <option>11</option>
-                <option>12</option>
-                <option>13</option>
-                <option>14</option>
-                <option>15</option>
-            </select>
-        </div>
-        <button id="newLevelButton">New level</button>
-        <button id="toggleSolutionButton">Solution</button>
+      <div class="changeSize">
+        <p>Board size:</p>
+        <select name="Board size" id="boardSize">
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option selected>8</option>
+          <option>9</option>
+          <option>10</option>
+          <option>11</option>
+          <option>12</option>
+          <option>13</option>
+          <option>14</option>
+          <option>15</option>
+        </select>
+      </div>
+      <button id="newLevelButton">New level</button>
+      <button id="toggleSolutionButton">Solution</button>
     </div>
-</body>
+  </body>
 </html>
