@@ -1,5 +1,5 @@
 import { Flow } from "./flow.js";
-import { Color, Direction, Point, Share } from "./models/models.js";
+import { Color, Direction, Point } from "./models/models.js";
 import {
   directions,
   getValidFlow,
@@ -11,7 +11,7 @@ import {
   noLineWrap,
   pointsAreEqual,
   touchingOtherFlowDot,
-  touchingOtherFlowLine,
+  touchingOtherFlowLine
 } from "./utils.js";
 
 export class Game {
