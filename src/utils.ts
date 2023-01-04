@@ -119,7 +119,7 @@ export function isValidNewLine(pos: Point, flow: Flow): boolean {
 export function isfinishFlow(pos: Point, flow: Flow): boolean {
   return (
     (pointsAreEqual(flow.end, pos) &&
-      pointsAreEqual(flow.start, flow.corners.at(0)!)) || // We are at second point and started at first point
+      pointsAreEqual(flow.start, flow.corners.at(0)!)) ||
     (pointsAreEqual(flow.start, pos) &&
       pointsAreEqual(flow.end, flow.corners.at(0)!))
   );

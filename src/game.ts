@@ -95,15 +95,17 @@ export class Game {
       .slice(0, this.boardSize)
       // will generate number of -1, 0 or 1 to sort the colors
       .sort(() => Math.floor(Math.random() * 3) - 1)
-      .forEach((_color: string | Color, i: number) => {
-        let solution: Point[] = [];
+      .forEach((_color: string | Color, index: number) => {
+        const solution: Point[] = [];
+
         for (let row = 0; row < this.boardSize; row++)
-          solution.push({ row: row, column: i });
+          solution.push({ row: row, column: index });
+
         this.flows.push(
           new Flow(
-            i,
-            { row: 0, column: i },
-            { row: this.boardSize - 1, column: i },
+            index,
+            { row: 0, column: index },
+            { row: this.boardSize - 1, column: index },
             solution
           )
         );
@@ -114,10 +116,10 @@ export class Game {
     this.showSolution = !this.showSolution;
   }
 
-  public caseClicked(pos: Point) {
+  public caseClicked(pos: Point): void {
     if (!this.showSolution && !this.isBoardCompleted()) {
       this.flows.forEach((flow: Flow) => {
-        if (pointsAreEqual(flow.start, pos) || pointsAreEqual(flow.end, pos!)) {
+        if (pointsAreEqual(flow.start, pos) || pointsAreEqual(flow.end, pos)) {
           flow.lines = [pos];
           flow.corners = [pos];
           flow.completed = false;
@@ -130,11 +132,11 @@ export class Game {
   public isBoardCompleted(): boolean {
     if (!this.flows.every((flow: Flow) => flow.completed)) return false;
 
-    let totalLines = 0;
-    this.flows.forEach((flow: { lines: string | any[] }) => {
+    let totalLines: number = 0;
+    this.flows.forEach((flow: Flow) => {
       totalLines += flow.lines.length;
     });
-    return totalLines == this.boardSize * this.boardSize;
+    return totalLines === this.boardSize * this.boardSize;
   }
 
   private resetLine(): void {
@@ -157,12 +159,16 @@ export class Game {
       this.resetLine();
       return;
     }
+
     if (isCorner(pos, flow)) flow.corners.push(flow.lines.at(-1)!);
+
     if (isfinishFlow(pos, flow)) {
       this.finishFlow(pos, flow);
       return;
     }
+
     if (noLineWrap(flow, pos)) return;
+
     if (
       touchingOtherFlowDot(this.flows, flow, pos) ||
       touchingOtherFlowLine(this.flows, flow, pos)
@@ -170,6 +176,7 @@ export class Game {
       this.resetLine();
       return;
     }
+
     flow.lines.push(pos);
   }
 }
