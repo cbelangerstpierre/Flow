@@ -30,7 +30,7 @@ export function noLineWrap(flow: Flow, pos: Point): boolean {
         let removedPoint: Point = flow.lines.pop()!;
 
         // Remove the corner if we removed the point
-        flow.corners.forEach((corner: any) => {
+        flow.corners.forEach((corner: Point) => {
           if (pointsAreEqual(corner, removedPoint))
             flow.corners.splice(flow.corners.indexOf(corner), 1);
         });
@@ -63,7 +63,7 @@ export function touchingOtherFlowLine(
   return !flows
     .filter((f: Flow) => f !== flow)
     .every((f: Flow) => {
-      return f.lines.every((c: any) => {
+      return f.lines.every((c: Point) => {
         if (pointsAreEqual(c, pos!)) {
           flow.lines = [];
           flow.corners = [];
@@ -139,10 +139,10 @@ export function pointsAreNeighboors(start: Point, end: Point): boolean {
 export function sharedVersion(flows: Flow[]): Share[] {
   let share: Share[] = [];
   flows.forEach((flow: Flow) => {
-    let solution: any[] = [];
-    flow.solution.forEach((s: { row: any; column: any }) => {
-      solution.push(s.row);
-      solution.push(s.column);
+    let solution: number[] = [];
+    flow.solution.forEach((point: Point) => {
+      solution.push(point.row);
+      solution.push(point.column);
     });
     share.push({
       color: flow.color,

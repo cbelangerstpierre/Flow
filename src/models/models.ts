@@ -45,5 +45,5 @@ export interface Share {
   flowStartColumn: number,
   flowEndRow: number,
   flowEndColumn: number,
-  solution: Point[]
+  solution: number[]
 }

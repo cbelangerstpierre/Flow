@@ -151,7 +151,7 @@ function updateHtml() {
   html.movesCounter.innerText = `Moves: ${game.movesCounter}`;
   html.percentDone.innerText = `Pipe: ${Math.floor(
     (game.flows.reduce(
-      (prev: any, current: { lines: string | any[] }) =>
+      (prev: number, current: Flow) =>
         prev + current.lines.length,
       0
     ) /
