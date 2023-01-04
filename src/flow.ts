@@ -1,4 +1,6 @@
-class Flow {
+import { Color, Point } from "./models/models.js";
+
+export class Flow {
   color: Color;
   start: Point;
   end: Point;
