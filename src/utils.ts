@@ -111,8 +111,8 @@ export function isValidNewLine(pos: Point, flow: Flow): boolean {
   return !(
     Math.abs(flow.lines.at(-1)!.row - pos.row) > 1 ||
     Math.abs(flow.lines.at(-1)!.column - pos.column) > 1 ||
-    (flow.lines.at(-1)!.row != pos.row &&
-      flow.lines.at(-1)!.column != pos.column)
+    (flow.lines.at(-1)!.row !== pos.row &&
+      flow.lines.at(-1)!.column !== pos.column)
   );
 }
 
@@ -126,13 +126,13 @@ export function isfinishFlow(pos: Point, flow: Flow): boolean {
 }
 
 export function pointsAreEqual(start: Point, end: Point): boolean {
-  return start.row == end.row && start.column == end.column;
+  return start.row === end.row && start.column === end.column;
 }
 
 export function pointsAreNeighboors(start: Point, end: Point): boolean {
   return (
-    (Math.abs(start.row - end.row) == 1 && start.column == end.column) ||
-    (Math.abs(start.column - end.column) == 1 && start.row == end.row)
+    (Math.abs(start.row - end.row) === 1 && start.column === end.column) ||
+    (Math.abs(start.column - end.column) === 1 && start.row === end.row)
   );
 }
 

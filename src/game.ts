@@ -32,7 +32,12 @@ export class Game {
   public createLevel(): void {
     this.reset();
     this.initializeLevel();
+    this.createNewlyGeneratedLevel();
+    this.findCorners();
+    this.timeStart = new Date();
+  }
 
+  private createNewlyGeneratedLevel() {
     const iterationsMax: number = 10000;
     // Increment is at the bottom, in order to not always increment
     for (let i = 0; i < iterationsMax; ) {
@@ -40,7 +45,9 @@ export class Game {
       const currentDot: Point =
         Math.floor(Math.random() * 2) === 0 ? flow.start : flow.end;
 
-      const direction: Direction = directions.at(Math.floor(Math.random() * 4))!;
+      const direction: Direction = directions.at(
+        Math.floor(Math.random() * 4)
+      )!;
       const newDot: Point = {
         row: currentDot.row + direction.at(0)!,
         column: currentDot.column + direction.at(1)!,
@@ -61,8 +68,9 @@ export class Game {
         i++;
       }
     }
+  }
 
-    // Finds the corners in the newly created lines (flow.solution)
+  private findCorners() {
     this.flows.forEach((flow: Flow) => {
       let solutionLine: Point[] = flow.solution;
       flow.solution = [];
@@ -78,8 +86,6 @@ export class Game {
 
       flow.solution.push(flow.end);
     });
-
-    this.timeStart = new Date();
   }
 
   private initializeLevel(): void {
