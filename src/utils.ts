@@ -61,7 +61,7 @@ export function touchingOtherFlowLine(
   pos: Point
 ): boolean {
   return !flows
-    .filter((f: Flow) => f != flow)
+    .filter((f: Flow) => f !== flow)
     .every((f: Flow) => {
       return f.lines.every((c: any) => {
         if (pointsAreEqual(c, pos!)) {
@@ -81,7 +81,7 @@ export function isOnAnotherDot(
   newDot: Point
 ): boolean {
   return flows
-    .filter((f: Flow) => f != flow)
+    .filter((f: Flow) => f !== flow)
     .some((f: Flow) => {
       if (f.solution.length <= 3) return false;
 
@@ -89,7 +89,8 @@ export function isOnAnotherDot(
         f.start = f.solution.at(1)!;
         f.solution.shift();
         return true;
-      } else if (pointsAreEqual(f.end, newDot)) {
+      }
+      if (pointsAreEqual(f.end, newDot)) {
         f.end = f.solution.at(-2)!;
         f.solution.pop();
         return true;

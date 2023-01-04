@@ -6,12 +6,12 @@ import {
   isCorner,
   isfinishFlow,
   isInvalidNewDot,
-  isOnAnotherDot,
+  isOnAnotherDot as isNewDotOnAnExistingDot,
   isValidNewLine,
   noLineWrap,
   pointsAreEqual,
   touchingOtherFlowDot,
-  touchingOtherFlowLine
+  touchingOtherFlowLine,
 } from "./utils.js";
 
 export class Game {
@@ -33,21 +33,24 @@ export class Game {
     this.reset();
     this.initializeLevel();
 
-    const iterationsMax = 10000;
+    const iterationsMax: number = 10000;
+    // Increment is at the bottom, in order to not always increment
     for (let i = 0; i < iterationsMax; ) {
-      let flow: Flow = getValidFlow(this.flows, this.boardSize);
-      let currentDot: Point =
-        Math.floor(Math.random() * 2) == 0 ? flow.start : flow.end;
+      const flow: Flow = getValidFlow(this.flows, this.boardSize);
+      const currentDot: Point =
+        Math.floor(Math.random() * 2) === 0 ? flow.start : flow.end;
 
-      let direction: Direction = directions.at(Math.floor(Math.random() * 4))!;
-      let newDot: Point = {
+      const direction: Direction = directions.at(Math.floor(Math.random() * 4))!;
+      const newDot: Point = {
         row: currentDot.row + direction.at(0)!,
         column: currentDot.column + direction.at(1)!,
       };
-      if (isInvalidNewDot(newDot, this.boardSize)) continue;
 
-      // If newDot is on an existing dot
-      if (isOnAnotherDot(this.flows, flow, newDot)) {
+      if (isInvalidNewDot(newDot, this.boardSize)) {
+        continue;
+      }
+
+      if (isNewDotOnAnExistingDot(this.flows, flow, newDot)) {
         if (pointsAreEqual(flow.start, currentDot)) {
           flow.start = newDot;
           flow.solution.unshift(newDot);
@@ -55,7 +58,7 @@ export class Game {
           flow.end = newDot;
           flow.solution.push(newDot);
         }
-        i += 1;
+        i++;
       }
     }
 
@@ -78,7 +81,8 @@ export class Game {
 
     this.timeStart = new Date();
   }
-  public initializeLevel(): void {
+
+  private initializeLevel(): void {
     Object.values(Color)
       .slice(0, this.boardSize)
       .sort(() => Math.floor(Math.random() * 3) - 1)
@@ -150,7 +154,10 @@ export class Game {
       return;
     }
     if (noLineWrap(flow, pos)) return;
-    if (touchingOtherFlowDot(this.flows, flow, pos) || touchingOtherFlowLine(this.flows, flow, pos)) {
+    if (
+      touchingOtherFlowDot(this.flows, flow, pos) ||
+      touchingOtherFlowLine(this.flows, flow, pos)
+    ) {
       this.resetLine();
       return;
     }
