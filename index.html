@@ -6,20 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flow</title>
     <link rel="stylesheet" href="index.css">
-    <script src="dist/models/models.js" ></script>
-    <script src="dist/flow.js" ></script>
-    <script src="dist/htmlElements.js" defer></script>
-    <script src="dist/game.js" defer></script>
-    <script src="dist/main.js" defer></script>
+    <script type="module" src="dist/main.js" defer></script>
 </head>
 <body>
     <div id="popupGameFinished">
         <h2>Game won !</h2>
         <p id="moveToFinishGame">You succeed with x moves.</p>
         <p id="timeToFinishGame">You took x seconds to complete this level.</p>
-        <button onClick="createGame();drawPoints();">New level</button>
+        <button id="newLevelButtonEnd">New level</button>
         <div class="tooltip">
-            <button id="shareButton" onclick="shareGame();" onmouseout="html.shareToClipboardToolTip.innerHTML = `Copy url`;">
+            <button id="shareButton">
                 Share this level
             </button>
             <span id="shareToClipboardToolTip">Copy url</span>
@@ -51,8 +47,8 @@
                 <option>15</option>
             </select>
         </div>
-        <button onClick="createGame();drawPoints();">New level</button>
-        <button onClick="toggleSolution();">Solution</button>
+        <button id="newLevelButton">New level</button>
+        <button id="toggleSolutionButton">Solution</button>
     </div>
 </body>
 </html>
