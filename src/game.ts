@@ -37,7 +37,7 @@ export class Game {
     this.timeStart = new Date();
   }
 
-  private createNewlyGeneratedLevel() {
+  private createNewlyGeneratedLevel(): void {
     const iterationsMax: number = 10000;
     // Increment is at the bottom, in order to not always increment
     for (let i = 0; i < iterationsMax; ) {
@@ -70,19 +70,21 @@ export class Game {
     }
   }
 
-  private findCorners() {
+  private findCorners(): void {
     this.flows.forEach((flow: Flow) => {
-      let solutionLine: Point[] = flow.solution;
+      const solutionLine: Point[] = flow.solution;
       flow.solution = [];
 
       flow.solution.push(flow.start);
 
+      // Start at 1 and finish to 1 less since we want to access the one before and one after every time
       for (let i = 1; i < solutionLine.length - 1; i++)
         if (
           solutionLine.at(i - 1)!.row != solutionLine.at(i + 1)!.row &&
           solutionLine.at(i - 1)!.column != solutionLine.at(i + 1)!.column
-        )
+        ) {
           flow.solution.push(solutionLine.at(i)!);
+        }
 
       flow.solution.push(flow.end);
     });
