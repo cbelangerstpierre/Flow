@@ -46,7 +46,7 @@ export class Game {
         Math.floor(Math.random() * 2) === 0 ? flow.start : flow.end;
 
       const direction: Direction = directions.at(
-        Math.floor(Math.random() * 4)
+        Math.floor(Math.random() * directions.length)
       )!;
       const newDot: Point = {
         row: currentDot.row + direction.at(0)!,
@@ -93,6 +93,7 @@ export class Game {
   private initializeLevel(): void {
     Object.values(Color)
       .slice(0, this.boardSize)
+      // will generate number of -1, 0 or 1 to sort the colors
       .sort(() => Math.floor(Math.random() * 3) - 1)
       .forEach((_color: string | Color, i: number) => {
         let solution: Point[] = [];
